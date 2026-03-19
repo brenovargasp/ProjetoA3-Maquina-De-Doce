@@ -3,6 +3,9 @@ Repositório destinado para a entrega do Projeto A3 de Teoria da Computação e 
 
 # Para dar play no projeto, rode na root os seguintes comandos:
 
-1. python -m venv .venv
-2. python install -r requirements.txt
-3. python -m uvicorn backend.app.main:app --reload
+1. cd backend
+2. python -m venv .venv
+3. .venv\Scripts\Activate.ps1
+4. python install -r requirements.txt
+5. cd ..
+6. python -m uvicorn backend.app.main:app --reload
