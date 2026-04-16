@@ -2,10 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const floorMap = ["T", "1", "2", "3"];
 
     const catImages = {
-        T: "img/quest.png",
-        1: "img/andar1.png",
-        2: "img/andar2.png",
-        3: "img/andar3.png"
+        T: "/assets/quest.png",
+        1: "/assets/andar1.png",
+        2: "/assets/andar2.png",
+        3: "/assets/andar3.png"
     };
 
     let currentFloorIndex = 0;
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         buttonElement.classList.add("active");
 
         const goingUp = currentFloorIndex < targetIndex;
-        directionIcon.src = goingUp ? "img/subindo.png" : "img/descendo.png";
+        directionIcon.src = goingUp ? "../assets/subindo.png" : "../assets/descendo.png";
         directionIcon.style.display = "block";
 
         await closeDoors();
