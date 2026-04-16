@@ -28,14 +28,14 @@ app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
 
 @app.get("/style.css")
 def get_style():
-    return FileResponse(FRONTEND_DIR / "style.css")
+    return FileResponse(FRONTEND_DIR / "machine/style.css")
 
 
 @app.get("/script.js")
 def get_script():
-    return FileResponse(FRONTEND_DIR / "script.js")
+    return FileResponse(FRONTEND_DIR / "machine/script.js")
 
 
 @app.get("/")
 def serve_frontend():
-    return FileResponse(FRONTEND_DIR / "index.html")
+    return FileResponse(FRONTEND_DIR / "machine/index.html")
