@@ -194,3 +194,7 @@ function fecharModal() {
 window.addEventListener("load", () => {
   atualizarTela();
 });
+
+function entrarNoElevador() {
+  window.location.href = "/";
+}

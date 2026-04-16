@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         3: "/assets/andar3.png"
     };
 
-    let currentFloorIndex = 0;
+    let currentFloorIndex = 1;
     let isMoving = false;
 
     const displaySpan = document.getElementById("floor-display");
@@ -17,6 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const doorLeft = document.getElementById("door-left");
     const doorRight = document.getElementById("door-right");
     const buttons = document.querySelectorAll(".floor-btn");
+
+    displaySpan.innerText = floorMap[currentFloorIndex];
+    displaySpan.innerText = floorMap[currentFloorIndex];
+    cat.src = catImages[floorMap[currentFloorIndex]];
 
     buttons.forEach((button) => {
         button.addEventListener("click", (event) => {
@@ -29,14 +33,30 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isMoving) return;
 
         const targetIndex = floorMap.indexOf(targetFloorString);
-        if (targetIndex === currentFloorIndex) return;
+        const isGroundFloor = targetFloorString === "T";
 
         isMoving = true;
         setButtonsState(true);
         buttonElement.classList.add("active");
 
+        // Caso já esteja no térreo e clique no térreo
+        if (targetIndex === currentFloorIndex) {
+            if (isGroundFloor) {
+                await openDoors();
+                setTimeout(() => {
+                    window.location.href = "/machine";
+                }, 800);
+                return;
+            }
+
+            buttonElement.classList.remove("active");
+            setButtonsState(false);
+            isMoving = false;
+            return;
+        }
+
         const goingUp = currentFloorIndex < targetIndex;
-        directionIcon.src = goingUp ? "../assets/subindo.png" : "../assets/descendo.png";
+        directionIcon.src = goingUp ? "/assets/subindo.png" : "/assets/descendo.png";
         directionIcon.style.display = "block";
 
         await closeDoors();
@@ -45,6 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         directionIcon.removeAttribute("src");
         directionIcon.style.display = "none";
+
+        // Ao chegar no térreo e abrir a porta, entra na máquina
+        if (isGroundFloor) {
+            setTimeout(() => {
+                window.location.href = "/machine";
+            }, 800);
+            return;
+        }
 
         buttonElement.classList.remove("active");
         setButtonsState(false);
