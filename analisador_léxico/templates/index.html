@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexical Engine - Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos Base e Identidade Visual */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #0c081e; /* Seu fundo escuro */
+            
+            /* O segredo: o "at X% Y%" tira o ponto do meio e joga para cantos aleatórios */
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.6) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 85% 15%, rgba(0, 255, 255, 0.4) 1px, transparent 1.5px),
+                radial-gradient(circle at 45% 75%, rgba(255, 0, 255, 0.4) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 75% 85%, rgba(255, 255, 255, 0.4) 1px, transparent 1.5px),
+                radial-gradient(circle at 35% 45%, rgba(0, 255, 255, 0.3) 1px, transparent 1.5px);
+            
+            /* Usando números primos (137, 251, 193...) a grade quebra e os pontos ficam "soltos" */
+            background-size: 437px 813px, 431px 197px, 993px 239px, 231px 273px, 313px 223px;
+            
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 1. Título Chamativo com Abril Fatface e Gradiente */
+        h1 {
+            font-family: 'Abril Fatface', serif;
+            font-size: 3.5em;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #f568d1, #8e44ad); /* Gradiente Neon Magenta/Roxo */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 4px 20px rgba(221, 120, 221, 0.2);
+        }
+
+        h2 {
+            font-family: 'Abril Fatface', serif;
+            font-size: 1.8em;
+            color: #f568d1; /* Cor magenta chamativa */
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        /* Layout Principal */
+        .container {
+            display: flex;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        /* Painéis estilo Dashboard */
+        .panel {
+            background: rgba(255, 255, 255, 0.04); /* Efeito translúcido */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        .left-panel {
+            flex: 1.2;
+            min-width: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-panel {
+            flex: 1.8;
+            min-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Área do Editor de Código */
+        textarea {
+            width: 100%;
+            height: 380px;
+            background-color: #050510;
+            color: #00ff00; /* Texto verde estilo terminal */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            padding: 20px;
+            border: 1px solid #ff00ff; /* Borda magenta */
+            border-radius: 12px;
+            resize: none;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+        }
+
+        /* Botão de Ação Estilizado */
+        button {
+            background: linear-gradient(90deg, #ff00ff, #8e44ad);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            align-self: flex-start;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 255, 0.5);
+        }
+
+        /* 2. TABELAS FIXAS COM BARRA DE ROLAGEM */
+        .table-container {
+            max-height: 220px; /* Altura fixa para evitar que a página estique */
+            overflow-y: auto;  /* Ativa a barra de rolagem vertical */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Customização da Barra de Rolagem */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #f568d1; /* Scrollbar combinando com o tema */
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #16122e;
+            color: #eeee88; /* Cabeçalho em Ciano para contraste */
+            font-weight: bold;
+            padding: 12px;
+            position: sticky;
+            top: 0; /* Mantém o cabeçalho fixo no topo ao rolar */
+            z-index: 1;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Cores de Destaque para as Categorias de Tokens */
+        .keyword { color: #ff00ff; font-weight: bold; }
+        .identifier { color: #ffffff; }
+        .number { color: #00ffff; }
+        .operator { color: #f39c12; }
+        .error { color: #ff4d4d; font-weight: bold; background: rgba(255, 77, 77, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .code-style { font-family: 'Courier New', Courier, monospace; color: #a2a2a2; }
+    </style>
+</head>
+<body>
+
+    <h1>ANÁLISE LÉXICA</h1>
+    
+    <div class="container">
+        <div class="panel left-panel">
+            <h2>1. Código Fonte de Entrada</h2>
+            <textarea id="code" spellcheck="false" placeholder="Insira seu código para análise aqui..."></textarea>
+            <button onclick="analyze()">Executar Análise Léxica</button>
+        </div>
+
+        <div class="right-panel">
+            
+            <div class="panel">
+                <h2>Tokens Encontrados</h2>
+                <div class="table-container">
+                    <table id="tokens-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Linha</th>
+                                <th style="width: 35%;">Tipo</th>
+                                <th style="width: 50%;">Lexema (Valor)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3" style="color: #666;">Aguardando execução...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Tabela de Símbolos</h2>
+                <div class="table-container">
+                    <table id="symbols-table">
+                        <thead>
+                            <tr>
+                                <th>Identificador</th>
+                                <th>Classificação</th>
+                                <th>Linhas de Ocorrência</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3" style="color: #666;">Aguardando execução...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Caracteres Eliminados</h2>
+                <div class="table-container">
+                    <table id="eliminated-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">Tipo</th>
+                                <th style="width: 65%;">Conteúdo Ignorado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="2" style="color: #666;">Aguardando execução...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        async function analyze() {
+            const codeInput = document.getElementById('code').value;
+            if (!codeInput.trim()) {
+                alert("Por favor, insira algum código para analisar.");
+                return;
+            }
+
+            try {
+                // Envia os dados estruturados via POST para a rota do Flask
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: codeInput })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erro de comunicação com o servidor.");
+                }
+
+                const data = await response.json();
+
+                // 1. Processar e Renderizar a Tabela de Tokens
+                const tokensTbody = document.querySelector('#tokens-table tbody');
+                tokensTbody.innerHTML = '';
+                data.tokens.forEach(t => {
+                    let classStyle = 'identifier';
+                    if (t.type === 'KEYWORD') classStyle = 'keyword';
+                    else if (t.type === 'NUMBER') classStyle = 'number';
+                    else if (t.type === 'OPERATOR' || t.type === 'SYMBOL') classStyle = 'operator';
+                    else if (t.type === 'ERRO_LEXICO') classStyle = 'error';
+
+                    tokensTbody.innerHTML += `<tr>
+                        <td>${t.line}</td>
+                        <td class="${classStyle}"><strong>${t.type}</strong></td>
+                        <td class="code-style">${t.value}</td>
+                    </tr>`;
+                });
+
+                // 2. Processar e Renderizar a Tabela de Símbolos
+                const symbolsTbody = document.querySelector('#symbols-table tbody');
+                symbolsTbody.innerHTML = '';
+                if(data.symbol_table.length === 0) {
+                    symbolsTbody.innerHTML = `<tr><td colspan="3" style="color: #666;">Nenhum identificador encontrado.</td></tr>`;
+                } else {
+                    data.symbol_table.forEach(s => {
+                        symbolsTbody.innerHTML += `<tr>
+                            <td><strong style="color: #00ffff;">${s.name}</strong></td>
+                            <td>${s.details.type}</td>
+                            <td>${s.details.lines.join(', ')}</td>
+                        </tr>`;
+                    });
+                }
+
+                // 3. Processar e Renderizar Caracteres Eliminados
+                const eliminatedTbody = document.querySelector('#eliminated-table tbody');
+                eliminatedTbody.innerHTML = '';
+                if(data.eliminated.length === 0) {
+                    eliminatedTbody.innerHTML = `<tr><td colspan="2" style="color: #666;">Nenhum caractere foi descartado.</td></tr>`;
+                } else {
+                    data.eliminated.forEach(e => {
+                        // Tratamento simples para evitar quebras com tags HTML puras no texto inserido
+                        let safeValue = e.value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        eliminatedTbody.innerHTML += `<tr>
+                            <td><span style="color: #f39c12;">${e.type}</span></td>
+                            <td class="code-style">${safeValue}</td>
+                        </tr>`;
+                    });
+                }
+
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("Não foi possível conectar ao Backend. Certifique-se de que o seu arquivo app.py está rodando no terminal!");
+            }
+        }
+    </script>
+</body>
+</html>
